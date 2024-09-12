@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MomentaryMessages.Models;
+using MomentaryMessages.ViewModels;
 using System.Diagnostics;
 
 namespace MomentaryMessages.Controllers

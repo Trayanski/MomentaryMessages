@@ -1,4 +1,4 @@
-namespace MomentaryMessages.Models
+namespace MomentaryMessages.ViewModels
 {
   public class ErrorViewModel
   {

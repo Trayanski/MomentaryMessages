@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using MomentaryMessages.Data.Models;
 
 namespace MomentaryMessages.Data
 {
@@ -9,5 +10,6 @@ namespace MomentaryMessages.Data
         : base(options)
     {
     }
+    public DbSet<SecretViewLog> SecretViewLogs { get; set; } = default!;
   }
 }
