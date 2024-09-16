@@ -27,12 +27,12 @@ namespace MomentaryMessages.Data.Services
     }
 
     /// <summary>Gets an entity asynchronously as data transfer object.</summary>
-    /// <param name="viewerMachineName">The viewer machine name of a potentially stored entity.</param>
+    /// <param name="viewerName">The viewer name of a potentially stored entity.</param>
     /// <returns>An entity as data transfer object or null if entity with provided id is not found.</returns>
-    public async Task<SecretViewLogDto> GetByViewerMachineNameAsync(string viewerMachineName)
+    public async Task<SecretViewLogDto> GetByViewerNameAsync(string viewerName)
     {
       var entities = await GetAllAsyncHelper();
-      return entities.FirstOrDefault(x => x.ViewerMachineName == viewerMachineName);
+      return entities.FirstOrDefault(x => x.ViewerName == viewerName);
     }
 
     /// <summary>Adds an entity asynchronously to the database.</summary>
@@ -44,7 +44,7 @@ namespace MomentaryMessages.Data.Services
       await m_context.SecretViewLogs.AddAsync(model);
       await m_context.SaveChangesAsync();
       ClearCache();
-      return model.ViewerMachineName;
+      return model.ViewerName;
     }
 
     /// <summary>
@@ -53,13 +53,13 @@ namespace MomentaryMessages.Data.Services
     ///   but i didn't want to mess with the predefined logic, so i left it like that.
     /// </summary>
     /// <param name="updatedEntityDto">The updated entity as data transfer object.</param>
-    public virtual async Task UpdateAsync(string viewerMachineName, SecretViewLogDto updatedEntityDto)
+    public virtual async Task UpdateAsync(string viewerName, SecretViewLogDto updatedEntityDto)
     {
-      var entityDto = await GetByViewerMachineNameAsync(viewerMachineName);
+      var entityDto = await GetByViewerNameAsync(viewerName);
       if (entityDto == null)
         return;
 
-      var entity = await m_context.SecretViewLogs.FindAsync(viewerMachineName);
+      var entity = await m_context.SecretViewLogs.FindAsync(viewerName);
       if (entity == null)
       {
         var newEntity = m_context.SecretViewLogs.Entry(MapToModel(updatedEntityDto));
@@ -77,14 +77,14 @@ namespace MomentaryMessages.Data.Services
     }
 
     /// <summary>Deletes an entity with provided id.</summary>
-    /// <param name="viewerMachineName">The viewer machine name of the entity that is going to be deleted.</param>
-    public virtual async Task DeleteAsync(string viewerMachineName)
+    /// <param name="viewerName">The viewer name of the entity that is going to be deleted.</param>
+    public virtual async Task DeleteAsync(string viewerName)
     {
-      var entityDto = await GetByViewerMachineNameAsync(viewerMachineName);
+      var entityDto = await GetByViewerNameAsync(viewerName);
       if (entityDto == null)
         return;
 
-      var entityEntry = m_context.SecretViewLogs.Entry(new SecretViewLog { ViewerMachineName = viewerMachineName });
+      var entityEntry = m_context.SecretViewLogs.Entry(new SecretViewLog { ViewerName = viewerName });
       entityEntry.State = EntityState.Deleted;
       await m_context.SaveChangesAsync();
       ClearCache();
@@ -97,7 +97,7 @@ namespace MomentaryMessages.Data.Services
     {
       return new SecretViewLogDto
       {
-        ViewerMachineName = model.ViewerMachineName,
+        ViewerName = model.ViewerName,
         InitialViewDate = model.InitialViewDate,
         ViewsCount = model.ViewsCount
       };
@@ -110,7 +110,7 @@ namespace MomentaryMessages.Data.Services
     {
       return new SecretViewLog
       {
-        ViewerMachineName = dto.ViewerMachineName,
+        ViewerName = dto.ViewerName,
         InitialViewDate = dto.InitialViewDate,
         ViewsCount = dto.ViewsCount
       };

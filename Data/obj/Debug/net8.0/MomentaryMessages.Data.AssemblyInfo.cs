@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MomentaryMessages.Data")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f0a0bef6389c47e3cf9196f11bb5805c224dda24")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2ee7ea6f06c37bd10309f72e415ad6e4e362a441")]
 [assembly: System.Reflection.AssemblyProductAttribute("MomentaryMessages.Data")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MomentaryMessages.Data")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

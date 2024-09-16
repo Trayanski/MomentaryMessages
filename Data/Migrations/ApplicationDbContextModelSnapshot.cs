@@ -226,7 +226,7 @@ namespace MomentaryMessages.Data.Migrations
 
             modelBuilder.Entity("MomentaryMessages.Data.Models.SecretViewLog", b =>
                 {
-                    b.Property<string>("ViewerMachineName")
+                    b.Property<string>("ViewerName")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("InitialViewDate")
@@ -235,7 +235,7 @@ namespace MomentaryMessages.Data.Migrations
                     b.Property<int>("ViewsCount")
                         .HasColumnType("int");
 
-                    b.HasKey("ViewerMachineName");
+                    b.HasKey("ViewerName");
 
                     b.ToTable("SecretViewLogs");
                 });

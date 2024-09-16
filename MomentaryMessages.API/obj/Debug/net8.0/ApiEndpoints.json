@@ -1,0 +1,18 @@
+[
+  {
+    "ContainingType": "MomentaryMessages.API.Controllers.SuperSecretController",
+    "Method": "Index",
+    "RelativePath": "api/SuperSecret",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userName",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

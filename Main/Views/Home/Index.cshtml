@@ -5,4 +5,19 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    @{
+      var isUserAdmin = User.Identity.IsAuthenticated && User.IsInRole("Admin");
+    }
+    <div class="row justify-content-center">
+      @if (isUserAdmin)
+      {
+        <div class="col-3">
+          <a class="btn btn-danger text-light" asp-controller="SuperSecret" asp-action="GenerateLink">Generate a secret link</a>
+        </div>
+      }
+      <div class="@(isUserAdmin?"col-3":"col-6")">
+        <a class="btn btn-success text-light" asp-controller="SuperSecret" asp-action="Index">Tell me a secret!</a>
+      </div>
+    </div>
 </div>

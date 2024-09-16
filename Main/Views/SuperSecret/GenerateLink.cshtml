@@ -1,0 +1,71 @@
+﻿@model GenerateLinkViewModel
+@{
+  ViewData["Title"] = "GenerateLink";
+}
+
+<h1>Generate Link</h1>
+
+<div>
+  <form id="form1">
+    <div>
+      <div class="row">
+        <div class="col-4">
+          <input id="userName" class="w-100" />
+        </div>
+        <div class="col-4">
+          <button id="copyButton" class="w-100">Copy Text Box Text to Clip board</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <textarea disabled id="validationMessage" class="w-100"></textarea>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+  document.getElementById("copyButton").onclick = function (e) { 
+    e.preventDefault();
+    ValidateUserNameAndCopyToClipboard();
+  };
+  
+  function ValidateUserNameAndCopyToClipboard() {
+    var userNameEl = document.getElementById('userName');
+    var validationMessageEl = document.getElementById('validationMessage');
+    var userName = userNameEl.value;
+    if (userName.length > 50)
+      // Show validation message.
+      validationMessageEl.value = 'The maximum lenght is 50 characters.';
+    else if (!/^[a-zA-Z0-9]*$/.test(userName))
+      // Show validation message.
+      validationMessageEl.value = 'Please remove all special characters.';
+    else
+      CopyToClipboard(validationMessageEl, userNameEl);
+  }
+
+  function CopyToClipboard(validationMessageEl, userNameEl) {
+    var userName = '@Model.URLPrefix' + ('@Model.ViewerName' || userNameEl.value);
+    var input = document.createElement("input");
+    input.value = userName;
+    input.type = "text";
+    // add to the DOM
+    document
+      .getElementById('form1')
+      .appendChild(input);
+    // Select the text field
+    input.select();
+    input.setSelectionRange(0, 99999);
+    // Copy the text inside the text field
+    document.execCommand("copy");
+    // remove the element from DOM
+    input.remove();
+    // Show successful copy message.
+    validationMessageEl.value = 'Link \'' + userName + '\' was successfully copied.';
+  }
+</script>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
