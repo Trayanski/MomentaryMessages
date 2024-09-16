@@ -37,7 +37,15 @@ namespace MomentaryMessages.Controllers
       if (dtos.Any(x => x.ViewerName == validatedUserName))
         return View(nameof(Index), "There are no secrets here");
 
-      await m_service.AddAsync(new SecretViewLogDto() { ViewerName = validatedUserName });
+      try
+      {
+        await m_service.AddAsync(new SecretViewLogDto() { ViewerName = validatedUserName });
+      }
+      catch (Exception ex)
+      {
+        return View(nameof(Index), ex.Message);
+      }
+
       return View(nameof(Index), $"You have found the secret {validatedUserName}!");
     }
 

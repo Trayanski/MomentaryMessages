@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using MomentaryMessages.Data.DataTransferObjects;
 using MomentaryMessages.Data.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace MomentaryMessages.Data.Services
 {
@@ -40,6 +41,12 @@ namespace MomentaryMessages.Data.Services
     /// <returns>The id of the newly created entity.</returns>
     public virtual async Task<string> AddAsync(SecretViewLogDto dto)
     {
+      if (dto == null)
+        throw new ArgumentNullException();
+      if (dto.ViewerName.Length > 50
+        || dto.ViewerName.Any(ch => !char.IsLetterOrDigit(ch)))
+        throw new ValidationException("The name shouldn't exceed 50 letters and shouldn't contain special characters.");
+
       var model = MapToModel(dto);
       await m_context.SecretViewLogs.AddAsync(model);
       await m_context.SaveChangesAsync();
