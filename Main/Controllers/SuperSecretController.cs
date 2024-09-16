@@ -20,17 +20,25 @@ namespace MomentaryMessages.Controllers
     // GET: SuperSecret
     public async Task<IActionResult> Index(string? userName)
     {
-      string validatedUserName = User.IsInRole("Admin")
-        && userName != null
-        && !userName.IsNullOrEmpty()
-          ? userName
-          : User?.Identity?.Name ?? string.Empty;
+      string validatedUserName = User?.Identity?.Name ?? string.Empty;
+      var hasProvidedUserName = userName != null && !userName.IsNullOrEmpty();
+      if (User!.IsInRole("Admin"))
+      {
+        if (hasProvidedUserName)
+          validatedUserName = userName;
+      }
+      else
+      {
+        if (hasProvidedUserName)
+          return RedirectToAction("Index", "Home", null);
+      }
+
       var dtos = await m_service.GetAllAsync();
-      if (dtos.Any(x => x.ViewerName == userName))
+      if (dtos.Any(x => x.ViewerName == validatedUserName))
         return View(nameof(Index), "There are no secrets here");
 
-      await m_service.AddAsync(new SecretViewLogDto() { ViewerName = userName });
-      return View(nameof(Index), $"You have found the secret {userName}!");
+      await m_service.AddAsync(new SecretViewLogDto() { ViewerName = validatedUserName });
+      return View(nameof(Index), $"You have found the secret {validatedUserName}!");
     }
 
     // GET: SuperSecret/GenerateLink

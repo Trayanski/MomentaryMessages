@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MomentaryMessages", "Moment
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MomentaryMessages.Data", "..\Data\MomentaryMessages.Data.csproj", "{2CF9F98F-EBC5-4320-8001-B8D1D9E0AACF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MomentaryMessages.API", "..\MomentaryMessages.API\MomentaryMessages.API.csproj", "{8D7B573A-4260-4F26-81DD-D4C44BA3BE14}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{2CF9F98F-EBC5-4320-8001-B8D1D9E0AACF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2CF9F98F-EBC5-4320-8001-B8D1D9E0AACF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2CF9F98F-EBC5-4320-8001-B8D1D9E0AACF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8D7B573A-4260-4F26-81DD-D4C44BA3BE14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8D7B573A-4260-4F26-81DD-D4C44BA3BE14}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8D7B573A-4260-4F26-81DD-D4C44BA3BE14}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8D7B573A-4260-4F26-81DD-D4C44BA3BE14}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

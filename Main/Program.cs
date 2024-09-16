@@ -51,6 +51,8 @@ namespace MomentaryMessages
           pattern: "{controller=Home}/{action=Index}/{id?}");
       app.MapRazorPages();
 
+      #region DB Initialize
+
       // Seed initial data
       using (var scope = app.Services.CreateScope())
       {
@@ -70,13 +72,15 @@ namespace MomentaryMessages
         // Users
         // - Admins
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-        var adminUserNames = new[] { "admin" }; //, "sdsalamida", "mikeedwards-rs"
+        var adminUserNames = new[] { "admin" };
         await CreateUsers(userManager, adminUserNames, c_adminRole);
 
         // - Default
         var userNames = new[] { "user" };
         await CreateUsers(userManager, userNames, c_userRole);
       }
+
+      #endregion DB Initialize
 
       app.Run();
     }
