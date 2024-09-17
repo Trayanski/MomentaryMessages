@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MomentaryMessages.Data;
 using MomentaryMessages.Data.Services;
+using MomentaryMessages.Helper;
 
 namespace MomentaryMessages
 {
@@ -12,18 +13,23 @@ namespace MomentaryMessages
       var builder = WebApplication.CreateBuilder(args);
 
       // Add services to the container.
-      var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-      builder.Services.AddDbContext<ApplicationDbContext>(options =>
-           options.UseSqlServer(connectionString));
-
+      var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+      builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
       builder.Services.AddScoped<SecretViewLogsService>();
-
       builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-      builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-          .AddRoles<IdentityRole>()
-          .AddEntityFrameworkStores<ApplicationDbContext>();
+      builder.Services
+        .AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        .AddRoles<IdentityRole>()
+        .AddEntityFrameworkStores<ApplicationDbContext>();
       builder.Services.AddControllersWithViews();
+
+      // Email
+      builder.Services.Configure<SecretLinkSettings>(x =>
+      {
+        x.LinksExpireAfterXHours = builder.Configuration.GetValue<int>("SecretLinkSettings:ExpireAfterXHours");
+        x.LinksCanBeClickedXNumberOfTimes = builder.Configuration.GetValue<int>("SecretLinkSettings:CanBeClickedXNumberOfTimes");
+      });
 
       var app = builder.Build();
 
@@ -41,14 +47,11 @@ namespace MomentaryMessages
 
       app.UseHttpsRedirection();
       app.UseStaticFiles();
-
       app.UseRouting();
-
       app.UseAuthorization();
-
       app.MapControllerRoute(
-          name: "default",
-          pattern: "{controller=Home}/{action=Index}/{id?}");
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
       app.MapRazorPages();
 
       #region DB Initialize

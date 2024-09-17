@@ -39,7 +39,7 @@ namespace MomentaryMessages.Data.Services
     /// <summary>Adds an entity asynchronously to the database.</summary>
     /// <param name="dto">The data transfer object from which an entity can be created.</param>
     /// <returns>The id of the newly created entity.</returns>
-    public virtual async Task<string> AddAsync(SecretViewLogDto dto)
+    public virtual async Task<string> AddOrUpdateAsync(SecretViewLogDto dto)
     {
       if (dto == null)
         throw new ArgumentNullException();
@@ -48,7 +48,21 @@ namespace MomentaryMessages.Data.Services
         throw new ValidationException("The name shouldn't exceed 50 letters and shouldn't contain special characters.");
 
       var model = MapToModel(dto);
-      await m_context.SecretViewLogs.AddAsync(model);
+
+      var entity = await m_context.SecretViewLogs
+        .FirstOrDefaultAsync(x => x.ViewerName == dto.ViewerName);
+      if (entity == null)
+      {
+        // Add
+        await m_context.SecretViewLogs.AddAsync(model);
+      }
+      else
+      {
+        // Update
+        entity.ExpiryDate = dto.ExpiryDate;
+        entity.RemainingViewsCount--;
+      }
+
       await m_context.SaveChangesAsync();
       ClearCache();
       return model.ViewerName;
@@ -101,37 +115,27 @@ namespace MomentaryMessages.Data.Services
     /// <param name="model">The model object.</param>
     /// <returns>The data transfer object object.</returns>
     public SecretViewLogDto MapToDto(SecretViewLog model)
-    {
-      return new SecretViewLogDto
-      {
-        ViewerName = model.ViewerName,
-        InitialViewDate = model.InitialViewDate,
-        ViewsCount = model.ViewsCount
-      };
-    }
+      => new(model.ViewerName, model.ExpiryDate, model.RemainingViewsCount);
 
     /// <summary>Generates a model object from a data transfer object.</summary>
     /// <param name="dto">The data transfer object.</param>
     /// <returns>The model object.</returns>
     public SecretViewLog MapToModel(SecretViewLogDto dto)
-    {
-      return new SecretViewLog
+      => new()
       {
         ViewerName = dto.ViewerName,
-        InitialViewDate = dto.InitialViewDate,
-        ViewsCount = dto.ViewsCount
+        ExpiryDate = dto.ExpiryDate,
+        RemainingViewsCount = dto.RemainingViewsCount
       };
-    }
 
     private async Task<List<SecretViewLogDto>> GetAllAsyncHelper()
     {
-      if (!m_cache.TryGetValue(c_cacheKey, out List<SecretViewLogDto> dtos))
-      {
-        var entities = await m_context.SecretViewLogs.ToListAsync();
-        dtos = entities.Select(MapToDto).ToList();
-        m_cache.Set(c_cacheKey, dtos);
-      }
+      if (m_cache.TryGetValue(c_cacheKey, out List<SecretViewLogDto> dtos))
+        return dtos;
 
+      var entities = await m_context.SecretViewLogs.ToListAsync();
+      dtos = entities.Select(MapToDto).ToList();
+      m_cache.Set(c_cacheKey, dtos);
       return dtos;
     }
 

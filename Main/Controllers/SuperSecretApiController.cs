@@ -26,12 +26,16 @@ namespace MomentaryMessages.API.Controllers
           ? userName
           : User?.Identity?.Name ?? string.Empty;
       var dtos = await m_service.GetAllAsync();
-      if (dtos.Any(x => x.ViewerName == validatedUserName))
+      if (dtos
+        .Any(x =>
+          x.ViewerName == validatedUserName
+          && (x.ExpiryDate == null || (x.ExpiryDate != null && x.ExpiryDate < DateTime.Now))
+          && x.RemainingViewsCount == 0))
         return new JsonResult("There are no secrets here");
 
       try
       {
-        await m_service.AddAsync(new SecretViewLogDto() { ViewerName = validatedUserName });
+        await m_service.AddOrUpdateAsync(new SecretViewLogDto(validatedUserName));
       }
       catch (Exception ex)
       {

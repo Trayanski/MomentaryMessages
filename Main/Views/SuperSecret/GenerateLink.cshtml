@@ -9,11 +9,19 @@
   <form id="form1">
     <div>
       <div class="row">
-        <div class="col-4">
+        <div class="col-3">
           <input id="userName" class="w-100" />
         </div>
-        <div class="col-4">
+        <div class="col-3">
           <button id="copyButton" class="w-100">Copy Text Box Text to Clip board</button>
+        </div>
+        <div class="col-3">
+          <span>Assign expiry date (not required)</span>
+          <input id="expiryDate" type="datetime-local">
+        </div>
+        <div class="col-3">
+          <span>Number of views (not required)</span>
+          <input id="numberOfViews" type="number">
         </div>
       </div>
       <div class="row">
@@ -46,9 +54,9 @@
   }
 
   function CopyToClipboard(validationMessageEl, userNameEl) {
-    var userName = '@Model.URLPrefix' + ('@Model.ViewerName' || userNameEl.value);
+    var linkText = '@Model.URLPrefix' + ('@Model.ViewerName' || userNameEl.value);
     var input = document.createElement("input");
-    input.value = userName;
+    input.value = linkText;
     input.type = "text";
     // add to the DOM
     document
@@ -62,7 +70,37 @@
     // remove the element from DOM
     input.remove();
     // Show successful copy message.
-    validationMessageEl.value = 'Link \'' + userName + '\' was successfully copied.';
+    validationMessageEl.value = 'Link \'' + linkText + '\' was successfully copied.';
+
+    // Store contract for the created link
+    var expiryDateEl = document.getElementById('expiryDate');
+    var numberOfViewsEl = document.getElementById('numberOfViews');
+    if (expiryDateEl.value != '' || numberOfViewsEl.value != '') {
+      StoreContractForSecretLink(userNameEl.value, expiryDateEl.value, numberOfViewsEl.value, validationMessageEl);
+    }
+  }
+
+  function StoreContractForSecretLink(userName, expiryDate, canBeClickedXNumberOfTimes, validationMessageEl) {
+    // Creating Our XMLHttpRequest object 
+    let xhr = new XMLHttpRequest();
+
+    // Making our connection  
+    var prefix = '@Model.URLPrefix';
+    var extractedPrefix = prefix.substring(0, prefix.indexOf('?'));
+    let url = extractedPrefix + '/StoreSecretLinkContract'
+      + '?userName=' + userName
+      + '&expiryDate=' + expiryDate
+      + '&canBeClickedXNumberOfTimes=' + canBeClickedXNumberOfTimes;
+    xhr.open("POST", url, true);
+
+    // function execute after request is successful 
+    xhr.onreadystatechange = function (result, a, b) {
+      if (result.currentTarget.status != 200)
+        validationMessageEl.value = 'Error: ' + result;
+    }
+
+    // Sending our request 
+    xhr.send();
   }
 </script>
 

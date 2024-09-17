@@ -34,16 +34,20 @@ namespace MomentaryMessages.Controllers
       }
 
       var dtos = await m_service.GetAllAsync();
-      if (dtos.Any(x => x.ViewerName == validatedUserName))
+      var dto = dtos.FirstOrDefault(x => x.ViewerName == validatedUserName);
+      if (dto == null)
+        dto = new SecretViewLogDto(validatedUserName);
+      else if ((dto.ExpiryDate != null && dto.ExpiryDate < DateTime.Now)
+        || dto.RemainingViewsCount == 0)
         return View(nameof(Index), "There are no secrets here");
 
       try
       {
-        await m_service.AddAsync(new SecretViewLogDto() { ViewerName = validatedUserName });
+        await m_service.AddOrUpdateAsync(dto);
       }
       catch (Exception ex)
       {
-        return View(nameof(Index), ex.Message);
+        return View(nameof(Index), $"{ex.Message}; {ex.InnerException?.Message}");
       }
 
       return View(nameof(Index), $"You have found the secret {validatedUserName}!");
@@ -58,5 +62,26 @@ namespace MomentaryMessages.Controllers
         {
           URLPrefix = $"{Request.Scheme}://{Request.Host}/{RouteData.Values.Single(x => x.Key.Equals("controller")).Value}?userName="
         });
+
+    // GET: SuperSecret/StoreSecretLinkContract
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public async Task<JsonResult> StoreSecretLinkContract(string userName, DateTime? expiryDate = null, int? canBeClickedXNumberOfTimes = null)
+    {
+      const int c_remainingViewsCountForContractEntity = 1;
+      try
+      {
+        await m_service.AddOrUpdateAsync(new SecretViewLogDto(
+          userName,
+          expiryDate,
+          canBeClickedXNumberOfTimes ?? c_remainingViewsCountForContractEntity));
+      }
+      catch (Exception ex)
+      {
+        return new JsonResult(ex.Message) { StatusCode = StatusCodes.Status500InternalServerError };
+      }
+
+      return new JsonResult("Success") { StatusCode = StatusCodes.Status200OK };
+    }
   }
 }

@@ -4,9 +4,16 @@ namespace MomentaryMessages.Data.DataTransferObjects
 {
   public class SecretViewLogDto
   {
+    public SecretViewLogDto(string viewerName, DateTime? expiryDate = null, int? remainingViewsCount = null)
+    {
+      ViewerName = viewerName;
+      ExpiryDate = expiryDate;
+      RemainingViewsCount = remainingViewsCount ?? 0;
+    }
+
     [Key]
-    public required string ViewerName { get; set; }
-    public DateTime InitialViewDate { get; set; } = DateTime.Now;
-    public int ViewsCount { get; set; } = 0;
+    public string ViewerName { get; set; }
+    public DateTime? ExpiryDate { get; set; }
+    public int RemainingViewsCount { get; set; }
   }
 }
