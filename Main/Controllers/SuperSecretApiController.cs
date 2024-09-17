@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using MomentaryMessages.Data.DataTransferObjects;
 using MomentaryMessages.Data.Services;
+using MomentaryMessages.Helper;
 
 namespace MomentaryMessages.API.Controllers
 {
@@ -20,29 +19,8 @@ namespace MomentaryMessages.API.Controllers
     [HttpGet]
     public async Task<JsonResult> Index(string? userName)
     {
-      string validatedUserName = User.IsInRole("Admin")
-        && userName != null
-        && !userName.IsNullOrEmpty()
-          ? userName
-          : User?.Identity?.Name ?? string.Empty;
-      var dtos = await m_service.GetAllAsync();
-      if (dtos
-        .Any(x =>
-          x.ViewerName == validatedUserName
-          && (x.ExpiryDate == null || (x.ExpiryDate != null && x.ExpiryDate < DateTime.Now))
-          && x.RemainingViewsCount == 0))
-        return new JsonResult("There are no secrets here");
-
-      try
-      {
-        await m_service.AddOrUpdateAsync(new SecretViewLogDto(validatedUserName));
-      }
-      catch (Exception ex)
-      {
-        return new JsonResult(ex.Message);
-      }
-
-      return new JsonResult($"You have found the secret {userName}!");
+      var secretMessage = await SuperSecretHelper.GetSecretMessage(m_service, User, userName);
+      return new JsonResult(secretMessage);
     }
   }
 }

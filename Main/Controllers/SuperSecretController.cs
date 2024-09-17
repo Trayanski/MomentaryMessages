@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using MomentaryMessages.Data.DataTransferObjects;
 using MomentaryMessages.Data.Services;
+using MomentaryMessages.Helper;
 using MomentaryMessages.ViewModels;
 
 namespace MomentaryMessages.Controllers
@@ -20,37 +20,8 @@ namespace MomentaryMessages.Controllers
     // GET: SuperSecret
     public async Task<IActionResult> Index(string? userName)
     {
-      string validatedUserName = User?.Identity?.Name ?? string.Empty;
-      var hasProvidedUserName = userName != null && !userName.IsNullOrEmpty();
-      if (User!.IsInRole("Admin"))
-      {
-        if (hasProvidedUserName)
-          validatedUserName = userName;
-      }
-      else
-      {
-        if (hasProvidedUserName)
-          return RedirectToAction("Index", "Home", null);
-      }
-
-      var dtos = await m_service.GetAllAsync();
-      var dto = dtos.FirstOrDefault(x => x.ViewerName == validatedUserName);
-      if (dto == null)
-        dto = new SecretViewLogDto(validatedUserName);
-      else if ((dto.ExpiryDate != null && dto.ExpiryDate < DateTime.Now)
-        || dto.RemainingViewsCount == 0)
-        return View(nameof(Index), "There are no secrets here");
-
-      try
-      {
-        await m_service.AddOrUpdateAsync(dto);
-      }
-      catch (Exception ex)
-      {
-        return View(nameof(Index), $"{ex.Message}; {ex.InnerException?.Message}");
-      }
-
-      return View(nameof(Index), $"You have found the secret {validatedUserName}!");
+      var secretMessage = await SuperSecretHelper.GetSecretMessage(m_service, User, userName);
+      return View(nameof(Index), secretMessage);
     }
 
     // GET: SuperSecret/GenerateLink
